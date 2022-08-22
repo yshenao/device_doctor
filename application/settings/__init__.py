@@ -33,3 +33,6 @@ class Config(object):
     # RABBITPASSWORD="password"
     # RABBITHOST="your ip"
     # RABBITPORT=your port
+
+    DEVICE_PLATFORM_ADMIN_USER = 'thu9'
+    DEVICE_PLATFORM_ADMIN_PASSWORD = '202209'
