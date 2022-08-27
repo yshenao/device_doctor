@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>设备健康诊断</title>
+    <link href="style/common.css" rel="stylesheet">
+    <style>
+    .ui-header{height: 50px;display:flex}
+    .ui-header .left-part{display: -ms-flexbox; display: flex; -ms-flex-align: center;align-items: center;-ms-flex-pack: distribute;}
+    .ui-header .left-part img{display: inline-block;width: auto;height: 30px;margin-left: 10px;margin-right: 20px;cursor: pointer}
+    .system-name {padding-left: 20px; border-left: 1px solid #d8d8d8;}
+    .ui-header .left-part .menu-btn{height: 100%;color: #fff;cursor: pointer}
+    .fa {display: inline-block;font: normal normal normal 14px/1 FontAwesome;text-rendering: auto;-webkit-font-smoothing: antialiased;}
+    .fa-bars:before {content: "\f0c9";}
+    table {border-spacing: 0;border-collapse: collapse; font-size:13px;}
+    td,th {padding: 0;}
+    .el-table thead {color: #878d99;font-weight: 500}
+    .el-table thead th {background: #f5f7fa}
+    .el-table td,.el-table th {
+	/*padding: 8px 0;*/
+	padding: 0;
+	min-width: 0;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+/*	position: relative;*/
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<div>
+    <header class="el-header" style="height: 60px;">
+        <div class="ui-header" >
+            <div class="left-part">
+                <div class="menu-btn"><i data-v-3546b641="" class="fa fa-bars" style="font-size: 24px;"></i></div>
+                <img src="https://pipelineproject.oss-cn-shanghai.aliyuncs.com/images/1658220083779.png" alt="logo" >
+                <span class="system-name">设备健康管理系统</span>
+            </div>
+            <!--<div display="none" class="menu-btn"><i data-v-3546b641="" class="fa fa-bars" style="font-size: 24px;"></i></div>-->
+
+        </div>
+    </header>
+    <main class="el-main">
+        <section class="app-main">
+            <div class="custom-box">
+                {{data|safe}}
+                <!--≈<iframe src="http://subt.ankocp.com:8080/admin/superAdmin/index.shtml" frameborder="0" width="100%" height="100%"></iframe><!---->
+            </div>
+        </section>
+
+    </main>
+</div>
+</body>
+</html>

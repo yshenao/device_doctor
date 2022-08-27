@@ -63,7 +63,7 @@ class TestPointView(object):
         }).limit(20)
 
         resp = '<table border="1">'
-        resp += '<tr>'
+        resp += '<thead><tr>'
         resp += '<th>id</th>'
         resp += '<th>地址</th>'
         resp += '<th>位置描述</th>'
@@ -75,7 +75,7 @@ class TestPointView(object):
         resp += '<th>直流电流（mA）</th>'
         resp += '<th>极化试片面积（平方厘米）</th>'
         resp += '<th>交流电流（mA）</th>'
-        resp += '<th>交流试片面积（平方厘米）</th>'
+        resp += '<th>交流试片面积（平方厘米）</th></thead><tbody>'
 
         for t in testpoint_infos:
             resp += '<tr>'
@@ -98,8 +98,11 @@ class TestPointView(object):
                 value = t.get(attr, '')
                 if attr == 'taTimestamp':
                     value = timestamp_to_localtime(value)
-                resp += '<td>' + str(value) + '</td>'
-        resp += '</table>'
+                if attr == 'bsMeasureControlPointId':
+                    resp += '<td><a href="96.html">' + str(value) + '</a></td>'
+                else:
+                    resp += '<td>' + str(value) + '</td>'
+        resp += '</tbody></table>'
 
         mongoclient.close()
         return resp
