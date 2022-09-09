@@ -106,3 +106,67 @@ class TestPointView(object):
 
         mongoclient.close()
         return resp
+
+    def get_data(self):
+        user = 'anko'
+        passwd = 'ANKO.main.610'
+        mongoclient = pymongo.MongoClient(host='39.105.189.175', port=27017)
+        db = mongoclient.sub
+        db.authenticate(user, passwd)
+        collection = db.testPointA_CSZ
+
+        testpoint_infos = collection.find({}, {
+            '_id': 0,
+            'bsMeasureControlPointId': 1,
+            'taTimestamp': 1,
+            'address': 1,
+            'locationDes': 1,
+            'von_Revised': 1,
+            'voff_Revised': 1,
+            'battery': 1,
+            'cellType': 1,
+            'von2': 1,
+            'pilotArea': 1,
+            'vac2': 1,
+            'acPilotArea': 1,
+        # }).limit(20)
+        })
+
+        mongoclient.close()
+        return testpoint_infos
+
+class messagehistoryA(object):
+    def get_data(self):
+        user = 'anko'
+        passwd = 'ANKO.main.610'
+        mongoclient = pymongo.MongoClient(host='39.105.189.175', port=27017)
+        db = mongoclient.sub
+        db.authenticate(user, passwd)
+        collection = db.messageHistoryA_In3Month
+
+        messagehistoryA_infos = collection.find({}, {
+            '_id': 0,
+            'bsSubCompanyId': 1,
+            'bsMeasureControlPointId': 1,
+            'von2': 1,
+            'vac2': 1,
+            'von_Revised': 1,
+            'voff_Revised': 1,
+            'battery': 1,
+            'messageReceiveTimestamp': 1,
+            'IR': 1,
+            'pilotArea': 1,
+            'acPilotArea': 1,
+            'theState': 1,
+            'cSQ': 1,
+            'bsPipeId': 1,
+            'longitude': 1,
+            'latitude': 1,
+            'bsLocateMileage': 1,
+            'cellType': 1,
+            'vac': 1,
+            'taTimestamp': 1,
+        })
+
+        mongoclient.close()
+        return messagehistoryA_infos

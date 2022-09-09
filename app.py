@@ -2,7 +2,7 @@ from flask import Flask, Blueprint,request, render_template, redirect,abort
 from flask_sqlalchemy import SQLAlchemy
 from application.settings.dev import DevelopmentConfig
 from application.settings.production import ProductionConfig
-from application.apps.view import DepartmentView, TestPointView
+from application.apps.view import DepartmentView, TestPointView, messagehistoryA
 from application.exception import APIException, Success
 
 home_page = Blueprint('home_page',__name__,template_folder='templates')
@@ -21,7 +21,6 @@ def get_96_url():
     except TemplateNotFound:
         abort(404)
 
-
 app = Flask(__name__)
 
 config = {
@@ -36,6 +35,38 @@ db = SQLAlchemy(app)
 @app.route('/96')
 def hello_world():
     return render_template('96.html')
+
+@app.route('/table')
+def table():
+    page = request.args.get('page', 1, int)
+    pages, max_page = get_pages(page)
+    per_page = 20
+    if page == 1:
+        # 请求为默认的第一页
+        data = messagehistoryA().get_data().limit(per_page)
+        active_page = 1
+    else:
+        data = messagehistoryA().get_data().skip((page-1)*per_page).limit(per_page)
+        active_page = page
+    return render_template('table.html', data=list(data), pages=pages, active_page=active_page, max_page=max_page)
+def get_pages(page, index=3):
+    count = messagehistoryA().get_data().count()
+    if (count % 20) != 0:
+        pages = int(count // 20) + 1
+    else:
+        pages = int(count / 20)
+    pages = list(i for i in range(1, pages + 1))
+    # print(pages)
+    max_page = max(pages)
+    if page >= (max(pages)-index):
+        pages_ = pages[page-2:page+1]
+    else:
+        pages_ = (pages[page-1:page+2])
+    if len(pages_)<3:
+        pages_ = pages[-3:]
+    return pages_, max_page
+
+
 #
 # @app.route('/')
 # def hello_world():
