@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint,request, render_template, redirect,abort
+from flask import Flask, Blueprint,request, render_template, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from application.settings.dev import DevelopmentConfig
 from application.settings.production import ProductionConfig
@@ -7,19 +7,23 @@ from application.exception import APIException, Success
 
 home_page = Blueprint('home_page',__name__,template_folder='templates')
 
+
 @home_page.route('/index.html')
 def get_home_page():
     try:
         data = TestPointView().get_front_20()
-        return render_template('index.html',data=data)
+        return render_template('index.html', data=data)
     except TemplateNotFound:
         abort(404)
+
+
 @home_page.route('/96.html')
 def get_96_url():
     try:
         return render_template('96.html')
     except TemplateNotFound:
         abort(404)
+
 
 app = Flask(__name__)
 
@@ -29,12 +33,14 @@ config = {
 }
 Config = config['dev']
 app.config.from_object(Config)
-app.register_blueprint(home_page,url_prefix='/')
+app.register_blueprint(home_page, url_prefix='/')
 db = SQLAlchemy(app)
+
 
 @app.route('/96')
 def hello_world():
     return render_template('96.html')
+
 
 @app.route('/table')
 def table():
@@ -49,6 +55,8 @@ def table():
         data = messagehistoryA().get_data().skip((page-1)*per_page).limit(per_page)
         active_page = page
     return render_template('table.html', data=list(data), pages=pages, active_page=active_page, max_page=max_page)
+
+
 def get_pages(page, index=3):
     count = messagehistoryA().get_data().count()
     if (count % 20) != 0:
@@ -67,20 +75,14 @@ def get_pages(page, index=3):
     return pages_, max_page
 
 
-#
-# @app.route('/')
-# def hello_world():
-#     return 'Hello World!'
-#
-#
-# @app.route('/department/info')
-# def department_info():
-#     return DepartmentView().get_all()
-#
-#
-# @app.route('/testpoint/info')
-# def testpoint_info():
-#     return TestPointView().get_front_20()
+@app.route('/department/info')
+def department_info():
+    return DepartmentView().get_all()
+
+
+@app.route('/testpoint/info')
+def testpoint_info():
+    return TestPointView().get_front_20()
 
 
 @app.route('/login', methods=['POST', 'GET'])

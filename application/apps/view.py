@@ -1,6 +1,7 @@
 from application.util import timestamp_to_localtime
 import pymongo
 
+
 class DepartmentView(object):
     def get_all(self):
         from application.apps.model import Department
@@ -134,6 +135,7 @@ class TestPointView(object):
 
         mongoclient.close()
         return testpoint_infos
+
 
 class messagehistoryA(object):
     def get_data(self):

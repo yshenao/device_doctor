@@ -1,5 +1,6 @@
 # 设备健康诊断平台代码仓库
-平台介绍
+- 健康诊断云平台，提供阴保设备（恒电位仪，智能测试桩）的异常诊断能力，通过分析设备采集的数据反向推理设备的健康状况。
+- 提供一套异常诊断能力的开放接口Open API，供外部服务调用
 
 ### 插件:
 - Flask Web框架
@@ -24,17 +25,13 @@ $ pip install -r requirements.txt
 
 ```
 ## 配置信息
-- Mysql Config
+- Mysql & MongoDB Config
 ```
 device_doctor/application/settings/__init__.py
 ```
-- MongoDB Config
-```
-device_doctor/application/apps/view.py   后续会调整
-```
 
-## Run Flask
-### Run flask for develop
+## Run Service
+### Run Web for develop
 ```
 $ python device_doctor/app.py
 ```
@@ -45,5 +42,9 @@ In flask, Default port is `5000`
 - Mysql部门数据： `http://127.0.0.1:5000/department/info`
 
 - MongoDB测试桩数据： `http://127.0.0.1:5000/testpoint/info`
+### Run Cronjob for develop
+```
+$ python scripts/testpoint_abnormal_analyze.py
+```
 
 
