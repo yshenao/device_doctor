@@ -1,6 +1,3 @@
-from urllib.parse import quote
-
-
 # 全局通用配置类
 class Config(object):
     """项目配置核心类"""
@@ -25,9 +22,10 @@ class Config(object):
     # 数据库连接池的大小
     SQLALCHEMY_POOL_SIZE = 10
     # 指定数据库连接池的超时时间
-    SQLALCHEMY_POOL_TIMEOUT = 10
+    SQLALCHEMY_POOL_TIMEOUT = 7200
+    SQLALCHEMY_POOL_RECYCLE = 14400
     # 控制在连接池达到最大值后可以创建的连接数。当这些额外的 连接回收到连接池后将会被断开和抛弃。
-    SQLALCHEMY_MAX_OVERFLOW = 2
+    SQLALCHEMY_MAX_OVERFLOW = 5
 
     # #rabbitmq参数配置
     # RABBITUSER="user"
@@ -43,5 +41,5 @@ class Config(object):
     MONGODB_USER = 'anko'
     MONGODB_PASSWORD = 'ANKO.main.610'
     MONGODB_IP = '39.105.189.175'
-    MONGODB_PORT = '27017'
+    MONGODB_PORT = 27017
     MONGODB_NAME = 'sub'

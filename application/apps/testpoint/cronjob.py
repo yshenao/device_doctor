@@ -1,10 +1,12 @@
 from application.apps.testpoint.analyze import Analyze
 from datetime import datetime
+import traceback
+import json
 
 
 class Cronjob(Analyze):
     def __init__(self):
-        super(Analyze, self).__init__()
+        super().__init__()
 
     def execute(self):
         is_fail, fail_reason = False, ''
@@ -12,13 +14,22 @@ class Cronjob(Analyze):
         try:
             lastest_cronjob_id = self.MysqlClient.get_lastest_cronjob_id()
             new_cronjob_id = lastest_cronjob_id + 1
-            self.process(new_cronjob_id)
+            testpoint_map = self.preload()
+            self.analyze(testpoint_map, new_cronjob_id)
         except Exception as e:
+            # 失败打印失败信息和堆栈，方便排查问题
             print(e)
-            is_fail, fail_reason = True, str(e)
-        end_time = datetime.now()
+            traceback.print_exc()
+            is_fail = True
+            fail_reason = json.dumps(
+                {
+                    'err_msg': str(e),
+                    'traceback': str(traceback.format_stack())
+                }
+            )
 
-        self.MysqlClient.add_testpoint_analysis_cronjob(
+        end_time = datetime.now()
+        self.MysqlClient2.add_testpoint_analysis_cronjob(
             id=new_cronjob_id,
             rule_ids=self.rule_ids,
             is_fail=is_fail,
@@ -30,5 +41,4 @@ class Cronjob(Analyze):
             start_time=start_time,
             end_time=end_time
         )
-
-        self.MysqlClient.commit()
+        self.MysqlClient2.commit()

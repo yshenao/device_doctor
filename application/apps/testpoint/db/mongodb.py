@@ -16,6 +16,8 @@ class MongoDBClient(object):
         self.client.close()
 
     def get_all_testpoint_info(self):
+        all_cnt = self.collection.count()
+        print('原始数据总量：{}'.format(all_cnt))
         select_fields = {
             '_id': 0,
             # 'bsSubCompanyId': 1,
@@ -39,12 +41,22 @@ class MongoDBClient(object):
             # 'vac': 1,
             'taTimestamp': 1,
         }
-        testpoint_infos = self.collection.aggregate({
-            {
-                "$sort": {
-                    "bsMeasureControlPointId": 1,        # 1表示升序，-1表示降序
-                    "taTimestamp": 1
+        self.collection.aggregate(
+            [
+                {
+                    '$sort': {
+                        'bsMeasureControlPointId': 1,  # 1表示升序，-1表示降序
+                        'taTimestamp': 1
+                    }
                 }
-            }
-        }).find({}, select_fields)
+            ], allowDiskUse=True
+        )
+        testpoint_infos = self.collection.find({}, select_fields, no_cursor_timeout=True)
+        # testpoint_infos = testpoint_infos.limit(100)
+        # testpoint_infos = self.collection.find({}, select_fields).sort(
+        #     [
+        #         ('taTimestamp', 1),
+        #         ('bsMeasureControlPointId', 1),
+        #     ]
+        # )
         return testpoint_infos
