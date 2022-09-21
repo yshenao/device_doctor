@@ -48,17 +48,15 @@ class DBProxy(object):
     def close(self):
         self.session.close()
 
-    def add_testpoint_abnormal_analysis(self, id, is_data_lost, start_time, end_time, abnormal_time, disturbed_time, cronjob_id):
+    def add_testpoint_abnormal_analysis(self, id, result, start_time, end_time, abnormal_time, disturbed_time, cronjob_id):
         record = TestPointAbnormalAnalysis(
             testpoint_id=id,
-            is_data_lost=is_data_lost,
-            is_abnormal=len(abnormal_time) > 0,
-            is_disturbed=len(disturbed_time) > 0,
+            result=result,
             data=json.dumps({
-                'abnormal_cnt': len(abnormal_time),
-                'abnormal_time': abnormal_time,
-                'disturbed_cnt': len(disturbed_time),
-                'disturbed_time': disturbed_time,
+                'abnormal_cnt': len(abnormal_time) if abnormal_time else 0,
+                'abnormal_time': abnormal_time or [],
+                'disturbed_cnt': len(disturbed_time) if disturbed_time else 0,
+                'disturbed_time': disturbed_time or [],
             }),
             create_time=datetime.now(),
             start_time=start_time,
@@ -67,16 +65,26 @@ class DBProxy(object):
         )
         self.records.append(record)
 
-    def add_testpoint_analysis_cronjob(self, id, rule_ids, is_fail, fail_reason, testpoint_cnt, abnormal_cnt,
-                                       disturbed_cnt, data, start_time, end_time):
+    def get_testpoint_abnormal_analysis(self, page, limit, cronjob_id):
+        query = self.session.query(TestPointAbnormalAnalysis).filter(TestPointAbnormalAnalysis.cronjob_id == cronjob_id).order_by(TestPointAbnormalAnalysis.testpoint_id.asc())
+        offset = 0
+        if page > 1:
+            offset = limit * (page - 1)
+        records = query.limit(limit).offset(offset).all()
+        return records
+
+    def add_testpoint_analysis_cronjob(self, id, rule_ids, is_fail, fail_reason, testpoint_cnt, data_lost_cnt,
+                                       abnormal_cnt, disturbed_cnt, normal_cnt, data, start_time, end_time):
         record = TestPointAbnormalCronjob(
             id=id,
             rule_ids=rule_ids,
             is_fail=is_fail,
             fail_reason=fail_reason,
             testpoint_cnt=testpoint_cnt,
+            data_lost_cnt=data_lost_cnt,
             abnormal_cnt=abnormal_cnt,
             disturbed_cnt=disturbed_cnt,
+            normal_cnt=normal_cnt,
             data=data,
             create_time=datetime.now(),
             start_time=start_time,
@@ -84,11 +92,11 @@ class DBProxy(object):
         )
         self.records.append(record)
 
-    def get_lastest_cronjob_id(self):
+    def get_lastest_cronjob(self):
         records = self.session.query(TestPointAbnormalCronjob).order_by(TestPointAbnormalCronjob.create_time.desc()).limit(1).all()
         if not records:
-            return 0
-        return records[0].id
+            return None
+        return records[0]
 
     def get_rule_ids(self):
         return self.session.query(TestPointAbnormalRule).filter(TestPointAbnormalRule.is_del == 0).all()

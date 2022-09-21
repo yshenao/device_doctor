@@ -1,5 +1,6 @@
 from application.settings import Config
 import pymongo
+from application.util import timestamp_to_localtime
 
 
 class MongoDBClient(object):
@@ -60,3 +61,46 @@ class MongoDBClient(object):
         #     ]
         # )
         return testpoint_infos
+
+    def get_testpoint_info(self, ids):
+        select_fields = {
+            '_id': 0,
+            'bsMeasureControlPointId': 1,
+            'voff_Revised': 1,
+            'taTimestamp': 1,
+        }
+        testpoint_infos = self.collection.find(
+            {
+                'bsMeasureControlPointId':
+                    {
+                        '$in': ids
+                    }
+            }, select_fields
+        ).sort(
+            [
+                ('taTimestamp', 1),
+            ]
+        )
+
+        testpoint_map = {}
+        for t in testpoint_infos:
+            if not testpoint_map.get(t.get('bsMeasureControlPointId')):
+                testpoint_map[t.get('bsMeasureControlPointId')] = [
+                    {
+                        'taTimestamp': timestamp_to_localtime(t.get('taTimestamp')),
+                        'voff_Revised': t.get('voff_Revised'),
+                        'unit': 'V'
+                    }
+                ]
+                continue
+            testpoint_map[t.get('bsMeasureControlPointId')].append(
+                {
+                    'taTimestamp': timestamp_to_localtime(t.get('taTimestamp')),
+                    'voff_Revised': t.get('voff_Revised'),
+                    'unit': 'V'
+                }
+            )
+        return testpoint_map
+
+    def get_single_testpoint_info(self, testpoint_id):
+        return self.get_testpoint_info([testpoint_id]).get(testpoint_id, {})

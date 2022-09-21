@@ -4,6 +4,8 @@ from application.settings.dev import DevelopmentConfig
 from application.settings.production import ProductionConfig
 from application.apps.view import DepartmentView, TestPointView, messagehistoryA
 from application.exception import APIException, Success
+from application.apps.testpoint.analyze import Analyze
+from application.apps.testpoint.db.mongodb import MongoDBClient
 
 home_page = Blueprint('home_page',__name__,template_folder='templates')
 
@@ -57,6 +59,34 @@ def table():
     return render_template('table.html', data=list(data), pages=pages, active_page=active_page, max_page=max_page)
 
 
+@app.route('/testpoint/abnormal_analysis/list')
+def get_testpoint_analysis_list():
+    page = request.args.get('page', 1, int)
+    limit = request.args.get('limit', 20, int)
+    return {
+        'code': 200,
+        'msg': 'success',
+        'data': Analyze().get_list(page, limit)
+    }
+
+
+@app.route('/testpoint/abnormal_analysis/info')
+def get_testpoint_analysis_info():
+    testpoint_id = request.args.get('testpoint_id', '', str)
+    if not testpoint_id:
+        return {
+            'code': 200,
+            'msg': 'id缺失',
+            'data': {}
+        }
+
+    return {
+        'code': 200,
+        'msg': 'success',
+        'data': MongoDBClient().get_single_testpoint_info(testpoint_id)
+    }
+
+
 def get_pages(page, index=3):
     count = messagehistoryA().get_data().count()
     if (count % 20) != 0:
@@ -103,4 +133,5 @@ def admin():
 
 
 if __name__ == '__main__':
+    app.config['JSON_AS_ASCII'] = False
     app.run()

@@ -7,14 +7,13 @@ from application.apps.testpoint.db.dal import DBProxy
 class Analyze(Rule):
     def __init__(self):
         super().__init__()
+        self.record_cnt = 0
+        self.invalid_record_cnt = 0
         self.total_cnt = 0
         self.data_lost_cnt = 0
         self.abnormal_cnt = 0
         self.disturbed_cnt = 0
-
-    def process(self, cronjob_id):
-        testpoint_map = self.preload()
-        self.analyze(testpoint_map, cronjob_id)
+        self.normal_cnt = 0
 
     def preload(self):
         # 数据预加载
@@ -50,17 +49,24 @@ class Analyze(Rule):
         self.MysqlClient2 = DBProxy()
         for id, info in testpoint_map.items():
             print('开始对测试桩进行异常分析id：{}'.format(id))
+            result, abnormal_time, disturbed_time = '', None, None
             is_data_lost, start_time, end_time = self.cal_is_data_lost(info)
             if is_data_lost:
                 self.data_lost_cnt += 1
-            abnormal_time, disturbed_time = self.cal_abnormal_data(info)
-            if len(abnormal_time) > 0:
-                self.abnormal_cnt += 1
-            if len(disturbed_time) > 0:
-                self.disturbed_cnt += 1
+                result = '数据丢失'
+            else:
+                abnormal_time, disturbed_time = self.cal_abnormal_data(info)
+                if len(abnormal_time) == 0:
+                    self.normal_cnt += 1
+                    result = '正常'
+                elif len(abnormal_time) > 0 and len(disturbed_time) > 0:
+                    self.disturbed_cnt += 1
+                    result = '干扰中'
+                elif len(abnormal_time) > 0 and len(disturbed_time) == 0:
+                    self.abnormal_cnt += 1
             self.MysqlClient2.add_testpoint_abnormal_analysis(
                 id=id,
-                is_data_lost=is_data_lost,
+                result=result,
                 start_time=timestamp_to_localtime(start_time),
                 end_time=timestamp_to_localtime(end_time),
                 abnormal_time=abnormal_time,
@@ -78,7 +84,7 @@ class Analyze(Rule):
 
         if expect_cnt == 0:
             return True, start_time, end_time
-        if actual_cnt * 100 / expect_cnt > 90:
+        if actual_cnt * 100 / expect_cnt > 50:
             return False, start_time, end_time
         return True, start_time, end_time
 
@@ -111,3 +117,29 @@ class Analyze(Rule):
                 'end_time': abnormal_end_time
             })
         return abnormal_time, disturbed_time
+
+    def get_list(self, page, limit):
+        cronjob = self.MysqlClient.get_lastest_cronjob()
+        analysis_list = self.MysqlClient.get_testpoint_abnormal_analysis(page, limit, cronjob.id)
+        testpoint_ids = []
+        for t in analysis_list:
+            testpoint_ids.append(t.testpoint_id)
+        # testpoint_ids = testpoint_ids[0:1]
+        # testpoint_map = MongoDBClient().get_testpoint_info(testpoint_ids)
+        result = {
+            'total_cnt': cronjob.testpoint_cnt,
+            'data_lost_cnt': cronjob.data_lost_cnt,
+            'abnormal_cnt': cronjob.abnormal_cnt,
+            'disturbed_cnt': cronjob.disturbed_cnt,
+            'normal_cnt': cronjob.normal_cnt,
+            'testpoint_info': []
+        }
+        for t in analysis_list:
+            result['testpoint_info'].append(
+                {
+                    'testpoint_id': t.testpoint_id,
+                    'analysis_result': t.result,
+                    # 'testpoint_data': testpoint_map.get(t.testpoint_id)
+                }
+            )
+        return result

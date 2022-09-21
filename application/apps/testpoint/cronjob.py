@@ -12,8 +12,11 @@ class Cronjob(Analyze):
         is_fail, fail_reason = False, ''
         start_time = datetime.now()
         try:
-            lastest_cronjob_id = self.MysqlClient.get_lastest_cronjob_id()
-            new_cronjob_id = lastest_cronjob_id + 1
+            lastest_cronjob = self.MysqlClient.get_lastest_cronjob()
+            if lastest_cronjob:
+                new_cronjob_id = lastest_cronjob.id + 1
+            else:
+                new_cronjob_id = 1
             testpoint_map = self.preload()
             self.analyze(testpoint_map, new_cronjob_id)
         except Exception as e:
@@ -35,8 +38,10 @@ class Cronjob(Analyze):
             is_fail=is_fail,
             fail_reason=fail_reason,
             testpoint_cnt=self.total_cnt,
+            data_lost_cnt=self.data_lost_cnt,
             abnormal_cnt=self.abnormal_cnt,
             disturbed_cnt=self.disturbed_cnt,
+            normal_cnt=self.normal_cnt,
             data='',
             start_time=start_time,
             end_time=end_time
