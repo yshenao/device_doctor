@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <div class="page-header text-center text-primary" style="margin: 10px auto">
+    <h1>abnormal_analysis</h1>
+    </div>
+    <title></title>
+    <link href="../static/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.1/dist/echarts.js"></script>
+</head>
+
+
+<body>
+    <center>
+
+        <div id="result_echarts" style="width:500px;height:500px;display:inline-block"></div>
+        <table border="1" style="width:500px;height:500px;display:inline-block">
+            <thead>
+                <tr height="40px">
+                    <th scope="col" width="250px">testpoint_id</th>
+                    <th scope="col" width="250px">analysis_result</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for data in html_data %}
+                <tr height="23px">
+                    <th><a href="/testpoint/abnormal_analysis/info?testpoint_id={{ data.testpoint_id }}">{{ data.testpoint_id }}</a></th>
+                    <th>{{ data.analysis_result }}</th>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!--翻页-->
+        <div class="row text-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-lg">
+                <li {% if active_page == 1 %}class="disabled"{% endif %}>
+                    <a href="{{ url_for('get_testpoint_analysis_list', page=1) }}">首页</a></li>
+                <li {% if active_page == 1 %}class="disabled"{% endif %}>
+                    <a href="{{ url_for('get_testpoint_analysis_list', page=active_page - 1) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for page in pages %}
+                <li class="{% if active_page == page %}active{% endif %}">
+                    <a href="{{ url_for('get_testpoint_analysis_list', page=page)}}">{{ page}}</a></li>
+                {% endfor %}
+                <li {% if active_page == max_page %}class="disabled"{% endif %}>
+                    <a href="{{ url_for('get_testpoint_analysis_list', page=active_page + 1) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li {% if active_page == max_page %}class="disabled"{% endif %}>
+                    <a href="{{ url_for('get_testpoint_analysis_list', page=max_page) }}">尾页</a></li>
+                <li class="disabled"><a>共{{ max_page }}页</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    </center>
+
+<script>
+    var status_count_ls = {{ list_data|tojson }}
+<!--    console.log(status_count_ls)-->
+</script>
+<script src="/static/js/echarts_result.js" type="text/javascript"></script>
+
+</body>
+</html>

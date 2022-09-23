@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <div class="page-header text-center text-primary" style="margin: 10px auto">
+<!--    <h1>{{ testpoint_id }}</h1>-->
+    </div>
+    <title></title>
+    <link href="/static/css/style.css" rel="stylesheet">
+<!--    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.1/dist/echarts.js"></script>-->
+    <script src="/static/js/echarts.min.js"></script>
+</head>
+
+<body>
+
+<center>
+    <div id="main_by_id" style="width: 1000px;height:600px;"></div>
+    <input type="button" value="返回" onclick="history.back()">
+</center>
+
+<script>
+    var echarts_data = {{ echarts_data|tojson }}
+    var data_ls = new Array()
+    var date_ls = new Array()
+    for (var i=0;i<echarts_data.length;i++){
+        data_ls.push(echarts_data[i].voff_Revised);
+        date_ls.push(echarts_data[i].taTimestamp);
+    }
+    <!--    console.log(data_ls)-->
+
+    var testpoint_id = "{{ testpoint_id|join }}"
+    <!--    console.log(testpoint_id)-->
+
+</script>
+<script src="/static/js/echarts_by_id.js" type="text/javascript"></script>
+
+</body>
+</html>

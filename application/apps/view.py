@@ -172,3 +172,14 @@ class messagehistoryA(object):
 
         mongoclient.close()
         return messagehistoryA_infos
+
+    def data(self):
+        user = 'anko'
+        passwd = 'ANKO.main.610'
+        mongoclient = pymongo.MongoClient(host='39.105.189.175', port=27017)
+        db = mongoclient.sub
+        db.authenticate(user, passwd)
+        collection = db.messageHistoryA_In3Month
+
+        mongoclient.close()
+        return collection

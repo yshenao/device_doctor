@@ -44,51 +44,27 @@ def hello_world():
     return render_template('96.html')
 
 
-@app.route('/table')
-def table():
-    page = request.args.get('page', 1, int)
-    pages, max_page = get_pages(page)
-    per_page = 20
-    if page == 1:
-        # 请求为默认的第一页
-        data = messagehistoryA().get_data().limit(per_page)
-        active_page = 1
-    else:
-        data = messagehistoryA().get_data().skip((page-1)*per_page).limit(per_page)
-        active_page = page
-    return render_template('table.html', data=list(data), pages=pages, active_page=active_page, max_page=max_page)
-
-
 @app.route('/testpoint/abnormal_analysis/list')
 def get_testpoint_analysis_list():
     page = request.args.get('page', 1, int)
     limit = request.args.get('limit', 20, int)
-    return {
+    list = {
         'code': 200,
         'msg': 'success',
         'data': Analyze().get_list(page, limit)
     }
+    # return list
 
+    list_data = list.get('data')
+    html_data = list_data.get('testpoint_info') #返回list
 
-@app.route('/testpoint/abnormal_analysis/info')
-def get_testpoint_analysis_info():
-    testpoint_id = request.args.get('testpoint_id', '', str)
-    if not testpoint_id:
-        return {
-            'code': 200,
-            'msg': 'id缺失',
-            'data': {}
-        }
+    total_cnt = list_data.get('total_cnt')
+    pages, max_page = get_pages_new(page,total_cnt)
+    active_page = page
 
-    return {
-        'code': 200,
-        'msg': 'success',
-        'data': MongoDBClient().get_single_testpoint_info(testpoint_id)
-    }
-
-
-def get_pages(page, index=3):
-    count = messagehistoryA().get_data().count()
+    return render_template('abnormal_analysis_list.html', list_data=list_data, html_data=html_data, pages=pages, active_page=active_page, max_page=max_page)
+def get_pages_new(page, total_cnt, index=5):
+    count = total_cnt
     if (count % 20) != 0:
         pages = int(count // 20) + 1
     else:
@@ -97,12 +73,33 @@ def get_pages(page, index=3):
     # print(pages)
     max_page = max(pages)
     if page >= (max(pages)-index):
-        pages_ = pages[page-2:page+1]
+        pages_ = pages[page-3:page+2]
     else:
-        pages_ = (pages[page-1:page+2])
-    if len(pages_)<3:
-        pages_ = pages[-3:]
+        pages_ = (pages[page-1:page+4])
+    if len(pages_)<5:
+        pages_ = pages[-5:]
+    # print(pages_)
     return pages_, max_page
+
+
+@app.route('/testpoint/abnormal_analysis/info')
+def get_testpoint_analysis_info():
+    testpoint_id = request.args.get('testpoint_id', '', str)
+    if not testpoint_id:
+        testpoint_analysis_info = {
+            'code': 200,
+            'msg': 'id缺失',
+            'data': {}
+        }
+    else:
+        testpoint_analysis_info = {
+            'code': 200,
+            'msg': 'success',
+            'data': MongoDBClient().get_single_testpoint_info(testpoint_id)
+        }
+    # return testpoint_analysis_info
+    echarts_data = testpoint_analysis_info.get('data')
+    return render_template('echarts_by_id.html', echarts_data=list(echarts_data), testpoint_id=testpoint_id)
 
 
 @app.route('/department/info')
