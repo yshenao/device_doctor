@@ -64,6 +64,7 @@ class Analyze(Rule):
                     result = '干扰中'
                 elif len(abnormal_time) > 0 and len(disturbed_time) == 0:
                     self.abnormal_cnt += 1
+                    result = '异常'
             self.MysqlClient2.add_testpoint_abnormal_analysis(
                 id=id,
                 result=result,
