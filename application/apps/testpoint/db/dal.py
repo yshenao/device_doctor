@@ -48,7 +48,7 @@ class DBProxy(object):
     def close(self):
         self.session.close()
 
-    def add_testpoint_abnormal_analysis(self, id, result, start_time, end_time, abnormal_time, disturbed_time, cronjob_id):
+    def add_testpoint_abnormal_analysis(self, id, result, start_time, end_time, abnormal_time, disturbed_time, expect_cnt, actual_cnt, cronjob_id):
         record = TestPointAbnormalAnalysis(
             testpoint_id=id,
             result=result,
@@ -57,6 +57,9 @@ class DBProxy(object):
                 'abnormal_time': abnormal_time or [],
                 'disturbed_cnt': len(disturbed_time) if disturbed_time else 0,
                 'disturbed_time': disturbed_time or [],
+                'expect_cnt': expect_cnt,
+                'actual_cnt': actual_cnt,
+                'actual_rate': float(actual_cnt) / float(expect_cnt) if expect_cnt else 0.0
             }),
             create_time=datetime.now(),
             start_time=start_time,

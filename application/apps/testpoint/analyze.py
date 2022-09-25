@@ -2,6 +2,8 @@ from application.apps.testpoint.rule import Rule
 from application.apps.testpoint.db.mongodb import MongoDBClient
 from application.util import deduplication, timestamp_to_localtime
 from application.apps.testpoint.db.dal import DBProxy
+from application.apps.testpoint.constant import ADVICE_MAP
+import json
 
 
 class Analyze(Rule):
@@ -50,7 +52,7 @@ class Analyze(Rule):
         for id, info in testpoint_map.items():
             print('开始对测试桩进行异常分析id：{}'.format(id))
             result, abnormal_time, disturbed_time = '', None, None
-            is_data_lost, start_time, end_time = self.cal_is_data_lost(info)
+            is_data_lost, start_time, end_time, expect_cnt, actual_cnt = self.cal_is_data_lost(info)
             if is_data_lost:
                 self.data_lost_cnt += 1
                 result = '数据丢失'
@@ -72,6 +74,8 @@ class Analyze(Rule):
                 end_time=timestamp_to_localtime(end_time),
                 abnormal_time=abnormal_time,
                 disturbed_time=disturbed_time,
+                expect_cnt=expect_cnt,
+                actual_cnt=actual_cnt,
                 cronjob_id=cronjob_id
             )
 
@@ -84,10 +88,10 @@ class Analyze(Rule):
         actual_cnt = len(info)
 
         if expect_cnt == 0:
-            return True, start_time, end_time
+            return True, start_time, end_time, 0, 0
         if actual_cnt * 100 / expect_cnt > 50:
-            return False, start_time, end_time
-        return True, start_time, end_time
+            return False, start_time, end_time, expect_cnt, actual_cnt
+        return True, start_time, end_time, expect_cnt, actual_cnt
 
     def cal_abnormal_data(self, info):
         # 计算异常数据
@@ -133,13 +137,19 @@ class Analyze(Rule):
             'abnormal_cnt': cronjob.abnormal_cnt,
             'disturbed_cnt': cronjob.disturbed_cnt,
             'normal_cnt': cronjob.normal_cnt,
-            'testpoint_info': []
+            'advice': ADVICE_MAP,
+            'testpoint_info': [],
         }
         for t in analysis_list:
+            data_map = json.loads(t.data)
             result['testpoint_info'].append(
                 {
                     'testpoint_id': t.testpoint_id,
                     'analysis_result': t.result,
+                    'expect_cnt': data_map.get('expect_cnt', 0),
+                    'actual_cnt': data_map.get('actual_cnt', 0),
+                    'actual_rate': data_map.get('actual_rate', 0),
+                    'disturbed_time': data_map.get('disturbed_time', []),
                     # 'testpoint_data': testpoint_map.get(t.testpoint_id)
                 }
             )

@@ -35,13 +35,8 @@ device_doctor/application/settings/__init__.py
 ```
 $ python device_doctor/app.py
 ```
-In flask, Default port is `5000`
+- 首页:  `http://39.105.108.252:8000/testpoint/abnormal_analysis/list`
 
-- 首页:  `http://127.0.0.1:5000/`
-
-- Mysql部门数据： `http://127.0.0.1:5000/department/info`
-
-- MongoDB测试桩数据： `http://127.0.0.1:5000/testpoint/info`
 ### Run Cronjob for develop
 ```
 $ python scripts/testpoint_abnormal_analyze.py
