@@ -1,6 +1,6 @@
 from application.settings import Config
 import pymongo
-from application.util import timestamp_to_localtime
+from application.util import timestamp_to_localtime, deduplication
 
 
 class MongoDBClient(object):
@@ -100,7 +100,10 @@ class MongoDBClient(object):
                     'unit': 'V'
                 }
             )
+        result = {}
+        for id, value in testpoint_map.items():
+            result[id] = deduplication(value)
         return testpoint_map
 
     def get_single_testpoint_info(self, testpoint_id):
-        return self.get_testpoint_info([testpoint_id]).get(testpoint_id, {})
+        return self.get_testpoint_info([testpoint_id])

@@ -73,7 +73,11 @@ class DBProxy(object):
         offset = 0
         if page > 1:
             offset = limit * (page - 1)
-        records = query.limit(limit).offset(offset).all()
+        if limit >= 0:
+            query = query.limit(limit)
+        if offset >= 0:
+            query = query.offset(offset)
+        records = query.all()
         return records
 
     def add_testpoint_analysis_cronjob(self, id, rule_ids, is_fail, fail_reason, testpoint_cnt, data_lost_cnt,

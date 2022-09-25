@@ -2,6 +2,7 @@ from application.apps.testpoint.analyze import Analyze
 from datetime import datetime
 import traceback
 import json
+from application.apps.testpoint.db.mongodb import MongoDBClient
 
 
 class Cronjob(Analyze):
@@ -18,6 +19,7 @@ class Cronjob(Analyze):
             else:
                 new_cronjob_id = 1
             testpoint_map = self.preload()
+            # testpoint_map = MongoDBClient().get_single_testpoint_info('5ac330e8c573ec31a24a99a1')
             self.analyze(testpoint_map, new_cronjob_id)
         except Exception as e:
             # 失败打印失败信息和堆栈，方便排查问题
