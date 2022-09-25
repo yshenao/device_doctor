@@ -3,7 +3,7 @@ ADVICE_MAP = {
         "solution": "人工介入排查",
         "reasons": [
             "电池断电",
-            "SIM卡信号强度太弱",
+            "SIM卡无信号",
         ]
     },
     "正常": {

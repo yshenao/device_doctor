@@ -87,11 +87,11 @@ class Analyze(Rule):
         expect_cnt = (end_time - start_time) / 1000 / 60 / 10
         actual_cnt = len(info)
 
-        if expect_cnt == 0:
-            return True, start_time, end_time, 0, 0
-        if actual_cnt * 100 / expect_cnt > 50:
-            return False, start_time, end_time, expect_cnt, actual_cnt
-        return True, start_time, end_time, expect_cnt, actual_cnt
+        # if expect_cnt == 0:
+        #     return True, start_time, end_time, 0, 0
+        # if actual_cnt * 100 / expect_cnt > 50:
+        #     return False, start_time, end_time, expect_cnt, actual_cnt
+        return False, start_time, end_time, expect_cnt, actual_cnt
 
     def cal_abnormal_data(self, info):
         # 计算异常数据
@@ -121,7 +121,7 @@ class Analyze(Rule):
                 'start_time': abnormal_start_time,
                 'end_time': abnormal_end_time
             })
-        return abnormal_time, disturbed_time
+        return abnormal_time, []
 
     def get_list(self, page, limit):
         cronjob = self.MysqlClient.get_lastest_cronjob()
