@@ -18,7 +18,7 @@ var option = {
       radius: '50%',
       data: [
         { value: status_count_ls.normal_cnt, name: '正常' },
-        { value: status_count_ls.data_lost_cnt, name: '数据丢失' },
+        { value: status_count_ls.data_lost_cnt, name: '数据缺失' },
         { value: status_count_ls.abnormal_cnt, name: '异常' },
         { value: status_count_ls.disturbed_cnt, name: '干扰中' },
       ],

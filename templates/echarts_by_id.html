@@ -13,9 +13,58 @@
 
 <body>
 
-<center>
-    <div id="main_by_id" style="width: 1000px;height:600px;"></div>
-    <input type="button" value="返回" onclick="history.back()">
+<center style="margin:50px">
+    <div id="main_by_id" style="width: 900px;height:600px;display:inline-block"></div>
+    <table border=1 style="width: 900px;height:600px;display:inline-block">
+        <tr height="35px">
+            <th width="900px">诊断结果</th>
+        </tr>
+        <tr height="55px">
+            <th>{{ result }}</th>
+        </tr>
+        <tr height="35px">
+            <th>诊断过程</th>
+        </tr>
+        <tr height="330px">
+            <th style="text-align:left;">
+                {% if result == '数据丢失' %}
+                    <div>1. 数据采集缺失</div>
+                    <div>{{ process.data_collect }}</div>
+                {% else %}
+                    <div>1. 数据采集正常</div>
+                    <div>{{ process.data_collect }}<br/><br/></div>
+                    {% if result == '正常' %}
+                        <div>2. 断电电位数据正常</div>
+                        <div>{{ process.voff}}</div>
+                    {% else %}
+                        <div>2. 断电电位数据异常</div>
+                        <div>{{ process.voff}}<br/><br/></div>
+                        {% if result == '干扰中' %}
+                            <div>3. 历史数据存在类似干扰</div>
+                        {% else %}
+                            <div>3. 历史数据不存在干扰</div>
+                        {% endif %}
+                        <div>{{ process.disturbed }}</div>
+                    {% endif %}
+                {% endif %}
+            </th>
+        </tr>
+        <tr height="35px">
+            <th>诊断建议</th>
+        </tr>
+        <tr height="95px">
+            <th>
+                {% if result == '数据丢失' %}
+                    <div>人工介入排查，可能导致故障的原因：<br/>1. 电池断电<br/>2. SIM卡信号强度太弱</div>
+                {% elif result == '异常' %}
+                    <div>人工介入排查</div>
+                {% else %}
+                    <div>无需处理</div>
+                {% endif %}
+            </th>
+        </tr>
+    </table>
+    <input type="button" value="返回" onclick="history.back()" style="display:block;margin:50px">
 </center>
 
 <script>
@@ -28,7 +77,7 @@
     }
     <!--    console.log(data_ls)-->
 
-    var testpoint_id = "{{ testpoint_id|join }}"
+    var testpoint_id = "{{ testpoint_id }}";
     <!--    console.log(testpoint_id)-->
 
 </script>

@@ -29,13 +29,18 @@ var option = {
   yAxis: {
         type: 'value',
         scale: true,
-        min: (value) => {
-            return value.min
-        },
-        max: (value) => {
-            return value.max
-        },
-        name: '断电电位'
+        min: -1.5,
+        max: 1.5,
+//        min: (value) => {
+//            return value.min
+//        },
+//        max: (value) => {
+//            return value.max
+//        },
+        name: '断电电位',
+        splitLine: {
+          show: false
+        }
     },
   grid: {
 //      bottom: '10%'
@@ -43,7 +48,13 @@ var option = {
   series: {
       type: 'line',
       showSymbol: false,
-      data: data_ls
+      data: data_ls,
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        data: [ { yAxis: -1.2 }, { yAxis: -0.85 } ],
+        animation: false,
+      }
     },
 };
 

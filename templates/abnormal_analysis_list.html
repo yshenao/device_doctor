@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <div class="page-header text-center text-primary" style="margin: 10px auto">
-    <h1>abnormal_analysis</h1>
+    <h1>设备健康诊断云平台</h1>
     </div>
     <title></title>
     <link href="../static/css/style.css" rel="stylesheet">
@@ -21,14 +21,14 @@
         <table border="1" style="width:500px;height:500px;display:inline-block">
             <thead>
                 <tr height="40px">
-                    <th scope="col" width="250px">testpoint_id</th>
-                    <th scope="col" width="250px">analysis_result</th>
+                    <th scope="col" width="250px">测试桩唯一标别id</th>
+                    <th scope="col" width="250px">诊断结果</th>
                 </tr>
             </thead>
             <tbody>
             {% for data in html_data %}
                 <tr height="23px">
-                    <th><a href="/testpoint/abnormal_analysis/info?testpoint_id={{ data.testpoint_id }}">{{ data.testpoint_id }}</a></th>
+                    <th><a href="/testpoint/abnormal_analysis/info?page={{ active_page }}&testpoint_id={{ data.testpoint_id }}&expect_cnt={{ data.expect_cnt }}&result={{ data.analysis_result }}&actual_cnt={{ data.actual_cnt}}&actual_rate={{ data.actual_rate }}">{{ data.testpoint_id }}</a></th>
                     <th>{{ data.analysis_result }}</th>
                 </tr>
             {% endfor %}
