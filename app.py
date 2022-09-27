@@ -139,7 +139,7 @@ def get_testpoint_analysis_info():
     process = {
         'data_collect': '当前测试桩采集周期为' + start_time + '-' + end_time + \
                         '，按照10分钟设备采集一次数据的规律，应当回传数据量为' + str(int(expect_cnt)) + \
-                        '，实际回传数据量为' + str(int(actual_cnt)) + '，采集率为' + str(int(actual_rate)*100) + \
+                        '，实际回传数据量为' + str(int(actual_cnt)) + '，采集率为' + str(int(actual_rate*100)) + \
                         '%，' + high_or_low + '于系统设置阈值50%，判定设备采集数据正常。',
         'voff': '最后一次采集时间：' + end_time + '，采集到的断电电位数据：' + str(last_voff_revised) + 'V，' +
                 voff_reasonable + '\n(国家标准：断电电位正常范围为-1.2~-0.85V，其中<-1.2V属于欠保护，>-0.85V属于过保护，判定为异常)',
