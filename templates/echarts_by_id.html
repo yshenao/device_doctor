@@ -14,19 +14,15 @@
 <body>
 
 <center style="margin:50px">
-    <div id="main_by_id" style="width: 900px;height:600px;display:inline-block"></div>
-    <table border=1 style="width: 900px;height:600px;display:inline-block">
+    <div id="main_by_id" style="width: 500px;height:300px;display:inline-block"></div>
+    <table border=1 style="width: 600px;height:400px;display:inline-block">
         <tr height="35px">
-            <th width="900px">诊断结果</th>
+            <th width="75px">诊断结果</th>
+            <th width="525px">{{ result }}</th>
         </tr>
-        <tr height="55px">
-            <th>{{ result }}</th>
-        </tr>
-        <tr height="35px">
+        <tr height="300px" id="process">
             <th>诊断过程</th>
-        </tr>
-        <tr height="330px">
-            <th style="text-align:left;">
+            <th style="text-align:left;" id="process_content">
                 {% if result == '数据丢失' %}
                     <div>1. 数据采集缺失</div>
                     <div>{{ process.data_collect }}</div>
@@ -49,10 +45,8 @@
                 {% endif %}
             </th>
         </tr>
-        <tr height="35px">
+        <tr height="55px" id="advice">
             <th>诊断建议</th>
-        </tr>
-        <tr height="95px">
             <th>
                 {% if result == '数据丢失' %}
                     <div>人工介入排查，可能导致故障的原因：<br/>1. 电池断电<br/>2. SIM卡信号强度太弱</div>
@@ -79,6 +73,18 @@
 
     var testpoint_id = "{{ testpoint_id }}";
     <!--    console.log(testpoint_id)-->
+
+    if ('{{ result }}' == '干扰中') {
+        document.getElementById("process_content").style.cssText='text-align:left;font-size:8px'
+    }
+    else if ('{{ result }}' == '异常') {
+        document.getElementById("process_content").style.cssText='text-align:left;font-size:14px'
+    }
+
+    if ('{{ result }}' == '数据丢失') {
+        document.getElementById("advice").style.cssText='text-align:left;height:75px'
+        document.getElementById("process").style.height='280px'
+    }
 
 </script>
 <script src="/static/js/echarts_by_id.js" type="text/javascript"></script>
