@@ -100,7 +100,7 @@ def get_testpoint_analysis_info():
         testpoint_analysis_info = {
             'code': 200,
             'msg': 'success',
-            'data': MongoDBClient().get_single_testpoint_info(testpoint_id)
+            'data': MongoDBClient().get_single_testpoint_info(testpoint_id).get(testpoint_id, {})
         }
     # return testpoint_analysis_info
     echarts_data = testpoint_analysis_info.get('data')

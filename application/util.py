@@ -32,7 +32,7 @@ def deduplication(list):
                 }
             )
             cur_time = i.get('taTimestamp')
-            cur_map[i.get('voff_Revised')] = 1
+            cur_map = {i.get('voff_Revised'): 1}
     if cur_time != 0 and len(cur_map) > 0:
         result.append(
             {
