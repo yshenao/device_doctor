@@ -2,7 +2,7 @@ from flask import Flask, Blueprint,request, render_template, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from application.settings.dev import DevelopmentConfig
 from application.settings.production import ProductionConfig
-from application.apps.view import DepartmentView, TestPointView, messagehistoryA
+from application.apps.view import TestPointView
 from application.exception import APIException, Success
 from application.apps.testpoint.analyze import Analyze
 from application.apps.testpoint.db.mongodb import MongoDBClient
@@ -147,11 +147,6 @@ def get_testpoint_analysis_info():
     }
 
     return render_template('echarts_by_id.html', process=process, result=result, echarts_data=list(echarts_data), testpoint_id=testpoint_id)
-
-
-@app.route('/department/info')
-def department_info():
-    return DepartmentView().get_all()
 
 
 @app.route('/testpoint/info')

@@ -2,42 +2,6 @@ from application.util import timestamp_to_localtime
 import pymongo
 
 
-class DepartmentView(object):
-    def get_all(self):
-        from application.apps.model import Department
-        resp = '<table border="1">'
-        resp += '<tr>'
-        resp += '<th>id</th>'
-        resp += '<th>部门名称</th>'
-        resp += '<th>所属子站</th>'
-        resp += '<th>状态可用</th>'
-        resp += '<th>创建时间</th>'
-        resp += '<th>删除原因</th>'
-        resp += '<th>是否为管理中心</th>'
-        resp += '<th>管理处排序</th>'
-        resp += '<th>自动报告排序</th>'
-
-        data = Department.query.all()
-        for d in data:
-            resp += '<tr>'
-            resp += '<td>' + str(d.tableId) + '</td>'
-            resp += '<td>' + d.theName + '</td>'
-            resp += '<td>' + str(d.subCompanyEx) + '</td>'
-            resp += '<td>' + str(d.theState) + '</td>'
-            resp += '<td>' + timestamp_to_localtime(d.createDatetimeStamp) + '</td>'
-            delete_reason = d.deleteReason or ''
-            resp += '<td>' + delete_reason + '</td>'
-            is_super_department = d.isSuperDepartment or ''
-            resp += '<td>' + is_super_department + '</td>'
-            order_number = d.orderNumber or ''
-            resp += '<td>' + str(order_number) + '</td>'
-            report_number = d.reportNumber or ''
-            resp += '<td>' + str(report_number) + '</td>'
-        resp += '</table>'
-
-        return resp
-
-
 class TestPointView(object):
     def get_front_20(self):
         user = 'anko'

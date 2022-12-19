@@ -35,6 +35,10 @@ device_doctor/application/settings/__init__.py
 ```
 $ python device_doctor/app.py
 ```
+### Run Web for Server
+```
+$ gunicorn -w 10 -b 0.0.0.0:8000 app:app
+```
 - 首页:  `http://39.105.108.252:8000/testpoint/abnormal_analysis/list`
 
 ### Run Cronjob for develop

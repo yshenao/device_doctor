@@ -1,5 +1,5 @@
 from application.apps.testpoint.db.model import TestPointAbnormalAnalysis, TestPointAbnormalCronjob, \
-    TestPointAbnormalRule
+    TestPointAbnormalRule, DeviceAnalysisCronjob, HdwyMeta, CszMeta
 import json
 from datetime import datetime
 from sqlalchemy import create_engine
@@ -105,5 +105,60 @@ class DBProxy(object):
             return None
         return records[0]
 
+    def get_lastest_cronjob_v2(self):
+        records = self.session.query(DeviceAnalysisCronjob).order_by(DeviceAnalysisCronjob.create_time.desc()).limit(1).all()
+        if not records:
+            return None
+        return records[0]
+
     def get_rule_ids(self):
         return self.session.query(TestPointAbnormalRule).filter(TestPointAbnormalRule.is_del == 0).all()
+
+    def add_hdwy_meta(self, hdwy_id, location_code, pipe_id, locate_mileage, collect_time, mode, out_volt, out_curr, set_value, pot1, pot2, alarm_type, cSQ):
+        record = HdwyMeta(
+            hdwy_id=hdwy_id,
+            location_code=location_code,
+            pipe_id=pipe_id,
+            locate_mileage=locate_mileage,
+            collect_time=collect_time,
+            mode=mode,
+            out_volt=out_volt,
+            out_curr=out_curr,
+            set_value=set_value,
+            pot1=pot1,
+            pot2=pot2,
+            alarm_type=alarm_type,
+            cSQ=cSQ
+        )
+        self.records.append(record)
+
+    def add_csz_meta(self, csz_id, location_code, pipe_id, locate_mileage, collect_time, von_Revised, voff_Revised, cellType, battery, cSQ):
+        record = CszMeta(
+            csz_id=csz_id,
+            location_code=location_code,
+            pipe_id=pipe_id,
+            locate_mileage=locate_mileage,
+            collect_time=collect_time,
+            von_Revised=von_Revised,
+            voff_Revised=voff_Revised,
+            cellType=cellType,
+            battery=battery,
+            cSQ=cSQ
+        )
+        self.records.append(record)
+
+    def add_device_analysis_cronjob(self, id, rule_ids, is_fail, fail_reason, pipe_cnt, hdwy_cnt, csz_cnt, data, start_time, end_time):
+        record = DeviceAnalysisCronjob(
+            id=id,
+            rule_ids=rule_ids,
+            is_fail=is_fail,
+            fail_reason=fail_reason,
+            pipe_cnt=pipe_cnt,
+            hdwy_cnt=hdwy_cnt,
+            csz_cnt=csz_cnt,
+            data=data,
+            create_time=datetime.now(),
+            start_time=start_time,
+            end_time=end_time
+        )
+        self.records.append(record)
