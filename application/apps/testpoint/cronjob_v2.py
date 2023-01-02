@@ -1,9 +1,8 @@
 from datetime import datetime
 import traceback
 import json
-from application.apps.testpoint.db.mongodb import MongoDBClient
 from application.apps.testpoint.db.dal import DBProxy
-from application.apps.testpoint.data_clean import DataClean
+from application.apps.testpoint.data_clean import DataClean, CalRef
 
 
 class Cronjob(object):
@@ -20,8 +19,9 @@ class Cronjob(object):
             else:
                 new_cronjob_id = 1
             # 数据清洗
-            data = DataClean().data_clean()
-
+            # data = DataClean().data_clean()
+            # 建立ref表
+            CalRef().cal_ref()
             # TODO
             # 自学习阈值
 
@@ -39,9 +39,10 @@ class Cronjob(object):
                 }
             )
 
-        self.commit_task(new_cronjob_id, is_fail, fail_reason, data, start_time)
+        self.commit_task(new_cronjob_id, is_fail, fail_reason, '', start_time)
 
     def commit_task(self, new_cronjob_id, is_fail, fail_reason, data, start_time):
+        self.MysqlClient = DBProxy()
         self.MysqlClient.add_device_analysis_cronjob(
             id=new_cronjob_id,
             rule_ids='',

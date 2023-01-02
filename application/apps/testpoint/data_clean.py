@@ -63,3 +63,46 @@ class DataClean(object):
             }
         })
         return data
+
+
+class CalRef(object):
+    def __init__(self):
+        self.MysqlClient = DBProxy()
+
+    def cal_ref(self):
+        hdwy_static, hdwy_locate_map = MongoDBClient().get_hdwy_static()
+        csz_static, csz_locate_map = MongoDBClient().get_csz_static()
+        pipes = self.MysqlClient.get_pipes()
+        for p in pipes:
+            print ('管道{}：恒电位仪数量{}，测试桩数量{}'.format(p.tableId, len(hdwy_static.get(p.tableId, [])), len(csz_static.get(p.tableId, []))))
+            # 一条管道上没有恒电位仪或者测试桩都属于脏数据，过滤掉
+            if not hdwy_static.get(p.tableId) or not csz_static.get(p.tableId):
+                continue
+            period_map = self.cal_min_max_period_map(hdwy_static.get(p.tableId))
+            for c in csz_static.get(p.tableId):
+                for hdwy_id, period in period_map.items():
+                    if period[0] <= c.get('bsLocateMileage') <= period[1]:
+                        print('min:{},value:{},max:{}'.format(period[0], c.get('bsLocateMileage'), period[1]))
+                        self.MysqlClient.add_hdwy_csz_ref(
+                            hdwy_id=hdwy_id,
+                            csz_id=c.get('bsMeasureControlPointId'),
+                            pipe_id=p.tableId,
+                            hdwy_locate_mileage=hdwy_locate_map[hdwy_id],
+                            csz_locate_mileage=csz_locate_map[c.get('bsMeasureControlPointId')],
+                        )
+        self.MysqlClient.commit()
+        return
+
+    def cal_min_max_period_map(self, hdwy):
+        hdwy = sorted(hdwy, key=lambda i: i['bsLocateMileage'])
+        period_map = {}
+        start, end = -1, 10000000
+        for i in range(0, len(hdwy)):
+            if i+1 >= len(hdwy):
+                period_map[hdwy[i].get('bsMeasureControlPointId')] = (start, end)
+                continue
+            old_start = start
+            temp = (hdwy[i].get('bsLocateMileage') + hdwy[i+1].get('bsLocateMileage'))/2
+            start = temp
+            period_map[hdwy[i].get('bsMeasureControlPointId')] = [old_start, start]
+        return period_map

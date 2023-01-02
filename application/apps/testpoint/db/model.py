@@ -102,3 +102,24 @@ class CszMeta(Base):
     cellType = Column(Integer, comment='智能测试桩电池类型')
     battery = Column(Float, comment='智能测试桩电池电压')
     cSQ = Column(String(255), comment='恒电位仪信号强度')
+
+
+class Pipe(Base):
+    # 管道总表
+    __tablename__ = 'pipe'
+
+    tableId = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键ID')
+    theName = Column(String(255), comment='子站名称')
+    theState = Column(Integer, comment='状态S_State')
+
+
+class HdwyCszRef(Base):
+    # 智能测试桩数据总表
+    __tablename__ = 'mem_hdwy_csz_ref'
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键ID')
+    hdwy_id = Column(String(255), default='', comment='恒电位仪唯一身份id')
+    csz_id = Column(String(255), default='', comment='智能测试桩唯一身份id')
+    pipe_id = Column(Integer, comment='管道id')
+    hdwy_locate_mileage = Column(Float, comment='恒电位仪管道里程数')
+    csz_locate_mileage = Column(Float, comment='智能测试桩管道里程数')

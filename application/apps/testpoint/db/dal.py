@@ -1,5 +1,5 @@
 from application.apps.testpoint.db.model import TestPointAbnormalAnalysis, TestPointAbnormalCronjob, \
-    TestPointAbnormalRule, DeviceAnalysisCronjob, HdwyMeta, CszMeta
+    TestPointAbnormalRule, DeviceAnalysisCronjob, HdwyMeta, CszMeta, Pipe, HdwyCszRef
 import json
 from datetime import datetime
 from sqlalchemy import create_engine
@@ -30,7 +30,7 @@ class DBProxy(object):
         self.session.begin()
 
     def commit(self):
-        batch_size = 100
+        batch_size = 10000
         records = []
         for record in self.records:
             if len(records) < batch_size:
@@ -160,5 +160,18 @@ class DBProxy(object):
             create_time=datetime.now(),
             start_time=start_time,
             end_time=end_time
+        )
+        self.records.append(record)
+
+    def get_pipes(self):
+        return self.session.query(Pipe).filter(Pipe.theState == 1).all()
+
+    def add_hdwy_csz_ref(self, hdwy_id, csz_id, pipe_id, hdwy_locate_mileage, csz_locate_mileage):
+        record = HdwyCszRef(
+            hdwy_id=hdwy_id,
+            csz_id=csz_id,
+            pipe_id=pipe_id,
+            hdwy_locate_mileage=hdwy_locate_mileage,
+            csz_locate_mileage=csz_locate_mileage,
         )
         self.records.append(record)

@@ -9,7 +9,8 @@ def job():
     try:
         Cronjob().execute()
     except Exception as e:
-        print(e)
+        print('Cronjob execute fail error {}'.format(e))
+        return
     print('Cronjob execute success')
 
 

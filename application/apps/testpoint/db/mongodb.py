@@ -131,7 +131,7 @@ class MongoDBClient(object):
         }
         self.collection.aggregate([], allowDiskUse=True)
         hdwy_infos = self.collection.find({}, select_fields, no_cursor_timeout=True)
-        # hdwy_infos = hdwy_infos.limit(100)
+        hdwy_infos = hdwy_infos.limit(100)
 
         deduplication_map = {}
         result = []
@@ -145,10 +145,10 @@ class MongoDBClient(object):
             if key in deduplication_map.keys():
                 if h.get('setValue') == deduplication_map[key]:
                     duplication_cnt = duplication_cnt + 1
-                    print('duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
+                    # print('duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
                 else:
                     non_duplication_cnt = non_duplication_cnt + 1
-                    print('non_duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
+                    # print('non_duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
                 # 去重
                 continue
             result.append({
@@ -188,7 +188,7 @@ class MongoDBClient(object):
         }
         self.collection.aggregate([], allowDiskUse=True)
         csz_infos = self.collection.find({}, select_fields, no_cursor_timeout=True)
-        # csz_infos = csz_infos.limit(100)
+        csz_infos = csz_infos.limit(100)
 
         deduplication_map = {}
         result = []
@@ -202,10 +202,10 @@ class MongoDBClient(object):
             if key in deduplication_map.keys():
                 if c.get('voff_Revised') == deduplication_map[key]:
                     duplication_cnt = duplication_cnt + 1
-                    print('duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
+                    # print('duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
                 else:
                     non_duplication_cnt = non_duplication_cnt + 1
-                    print('non_duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
+                    # print('non_duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
                 # 去重
                 continue
             result.append({
@@ -223,3 +223,98 @@ class MongoDBClient(object):
             deduplication_map[key] = c.get('voff_Revised')
         print("get_csz_history duplication_cnt: {}, non_duplication_cnt: {}".format(duplication_cnt, non_duplication_cnt))
         return result, origin_cnt, len(result)
+
+    def get_hdwy_static(self):
+        # 获取恒电位仪静态数据
+        self.collection = self.db.get_collection('terminalB_HDWY')
+        select_fields = {
+            '_id': 0,
+            'bsMeasureControlPointId': 1,
+            'locationCode': 1,
+            'bsPipeId': 1,
+            'bsLocateMileage': 1,
+            'bsTimestamp': 1,
+            'setValue': 1,
+        }
+        self.collection.aggregate([], allowDiskUse=True)
+        hdwy_infos = self.collection.find({}, select_fields, no_cursor_timeout=True)
+
+        deduplication_map = {}
+        result = {}
+        duplication_cnt = 0
+        non_duplication_cnt = 0
+        locate_map = {}
+        for h in hdwy_infos:
+            if not h.get('bsMeasureControlPointId') or not h.get('bsTimestamp'):
+                # 去空
+                continue
+            key = str(h.get('bsMeasureControlPointId')) + str(h.get('bsTimestamp'))
+            if key in deduplication_map.keys():
+                if h.get('setValue') == deduplication_map[key]:
+                    duplication_cnt = duplication_cnt + 1
+                    # print('duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
+                else:
+                    non_duplication_cnt = non_duplication_cnt + 1
+                    # print('non_duplication_cnt hdwy id:{}, time:{}'.format(h.get('bsMeasureControlPointId'), h.get('bsTimestamp')))
+                # 去重
+                continue
+            deduplication_map[key] = h.get('setValue')
+            info = {
+                'bsMeasureControlPointId': h.get('bsMeasureControlPointId'),
+                'bsPipeId': h.get('bsPipeId'),
+                'bsLocateMileage': h.get('bsLocateMileage'),
+            }
+            if result.get(h.get('bsPipeId')):
+                result[h.get('bsPipeId')].append(info)
+            else:
+                result[h.get('bsPipeId')] = [info]
+            locate_map[h.get('bsMeasureControlPointId')] = h.get('bsLocateMileage')
+        print("get_hdwy_static duplication_cnt: {}, non_duplication_cnt: {}".format(duplication_cnt, non_duplication_cnt))
+        return result, locate_map
+
+    def get_csz_static(self):
+        self.collection = self.db.get_collection('terminalA_YBSB')
+        select_fields = {
+            '_id': 0,
+            'bsMeasureControlPointId': 1,
+            'locationCode': 1,
+            'bsPipeId': 1,
+            'bsLocateMileage': 1,
+            'taTimestamp': 1,
+            'voff_Revised': 1,
+        }
+        self.collection.aggregate([], allowDiskUse=True)
+        csz_infos = self.collection.find({}, select_fields, no_cursor_timeout=True)
+
+        deduplication_map = {}
+        result = {}
+        duplication_cnt = 0
+        non_duplication_cnt = 0
+        locate_map = {}
+        for c in csz_infos:
+            if not c.get('bsMeasureControlPointId') or not c.get('taTimestamp'):
+                # 去空
+                continue
+            key = str(c.get('bsMeasureControlPointId')) + str(c.get('taTimestamp'))
+            if key in deduplication_map.keys():
+                if c.get('voff_Revised') == deduplication_map[key]:
+                    duplication_cnt = duplication_cnt + 1
+                    # print('duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
+                else:
+                    non_duplication_cnt = non_duplication_cnt + 1
+                    # print('non_duplication_cnt csz id:{}, time:{}'.format(c.get('bsMeasureControlPointId'), c.get('taTimestamp')))
+                # 去重
+                continue
+            deduplication_map[key] = c.get('voff_Revised')
+            info = {
+                'bsMeasureControlPointId': c.get('bsMeasureControlPointId'),
+                'bsPipeId': c.get('bsPipeId'),
+                'bsLocateMileage': c.get('bsLocateMileage'),
+            }
+            if result.get(c.get('bsPipeId')):
+                result[c.get('bsPipeId')].append(info)
+            else:
+                result[c.get('bsPipeId')] = [info]
+            locate_map[c.get('bsMeasureControlPointId')] = c.get('bsLocateMileage')
+        print("get_csz_static duplication_cnt: {}, non_duplication_cnt: {}".format(duplication_cnt, non_duplication_cnt))
+        return result, locate_map
